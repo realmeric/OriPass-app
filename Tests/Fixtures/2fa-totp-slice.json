@@ -1,0 +1,129 @@
+{
+ "github.com": {
+  "methods": [
+   "sms",
+   "totp",
+   "custom-software",
+   "u2f"
+  ],
+  "custom-software": [
+   "GitHub Mobile"
+  ],
+  "documentation": "https://docs.github.com/en/github/authenticating-to-github/securing-your-account-with-two-factor-authentication-2fa/configuring-two-factor-authentication",
+  "recovery": "https://docs.github.com/en/github/authenticating-to-github/securing-your-account-with-two-factor-authentication-2fa/recovering-your-account-if-you-lose-your-2fa-credentials",
+  "notes": "Hardware tokens must have a backup method, either SMS or software token."
+ },
+ "paypal.com": {
+  "methods": [
+   "totp",
+   "u2f"
+  ],
+  "documentation": "https://www.paypal.com/us/cshelp/article/help167",
+  "notes": "2FA can only be setup on the website. A backup 2FA method is needed to setup security key."
+ },
+ "zoom.us": {
+  "methods": [
+   "sms",
+   "totp"
+  ],
+  "documentation": "https://support.zoom.com/hc/article?id=zm_kb&sysparm_article=KB0066054"
+ },
+ "zoho.com": {
+  "methods": [
+   "sms",
+   "custom-software",
+   "totp",
+   "u2f"
+  ],
+  "custom-software": [
+   "Zoho OneAuth"
+  ],
+  "documentation": "https://help.zoho.com/portal/kb/articles/mfa-introduction"
+ },
+ "amazon.co.uk": {
+  "methods": [
+   "sms",
+   "call",
+   "totp"
+  ],
+  "documentation": "https://www.amazon.com/gp/help/customer/display.html?nodeId=G3PWZPU52FKN7PW4",
+  "notes": "SMS or phone call required to enable 2FA. Enabling on Amazon.com activates 2FA on other regional Amazon sites, such as UK and DE."
+ },
+ "visualstudio.microsoft.com": {
+  "methods": [
+   "sms",
+   "email",
+   "custom-software",
+   "totp"
+  ],
+  "custom-software": [
+   "Microsoft Authenticator"
+  ],
+  "documentation": "https://support.microsoft.com/en-us/help/12408/"
+ },
+ "wiggle.co.uk": {
+  "methods": [
+   "totp"
+  ],
+  "documentation": "https://wiggle.egain.cloud/kb/Wiggle_EN/content/Prod-13378/"
+ },
+ "digitalocean.com": {
+  "methods": [
+   "sms",
+   "totp"
+  ],
+  "documentation": "https://www.digitalocean.com/docs/accounts/security/2fa/"
+ },
+ "notion.so": {
+  "methods": [
+   "sms",
+   "totp"
+  ],
+  "documentation": "https://www.notion.so/help/two-step-verification"
+ },
+ "cloudflare.com": {
+  "methods": [
+   "totp",
+   "u2f"
+  ],
+  "documentation": "https://developers.cloudflare.com/fundamentals/setup/account/account-security/2fa/"
+ },
+ "slack.com": {
+  "methods": [
+   "sms",
+   "totp"
+  ],
+  "documentation": "https://get.slack.help/hc/en-us/articles/204509068"
+ },
+ "figma.com": {
+  "methods": [
+   "sms",
+   "totp"
+  ],
+  "documentation": "https://help.figma.com/hc/en-us/articles/360039817634"
+ },
+ "yahoo.com": {
+  "methods": [
+   "sms",
+   "call",
+   "totp",
+   "u2f"
+  ],
+  "documentation": "https://help.yahoo.com/kb/SLN5013.html",
+  "notes": "A recovery email or phone number is required for 2FA setup."
+ },
+ "xbox.com": {
+  "methods": [
+   "sms",
+   "email",
+   "custom-software",
+   "call",
+   "totp"
+  ],
+  "custom-software": [
+   "Microsoft Authenticator"
+  ],
+  "documentation": "https://support.microsoft.com/en-us/help/12408/",
+  "notes": "2FA phone calls may not be available in all regions"
+ }
+}

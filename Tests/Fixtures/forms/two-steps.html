@@ -1,0 +1,17 @@
+<!doctype html>
+<title>Sign in</title>
+<form id="form" action="#">
+  <div id="first">
+    <label>Email <input id="username" type="text" name="identifier" style="width: 300px"></label>
+    <button>Next</button>
+  </div>
+</form>
+<script>
+  document.getElementById("form").addEventListener("submit", (event) => {
+    event.preventDefault();
+    const name = document.getElementById("username").value;
+    document.getElementById("first").innerHTML = "<p id=name></p>"
+      + "<input id=password type=password name=password style='width: 300px'><button>Sign in</button>";
+    document.getElementById("name").textContent = name;
+  });
+</script>

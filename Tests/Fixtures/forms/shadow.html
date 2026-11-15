@@ -1,0 +1,31 @@
+<!doctype html>
+<title>A form of web components</title>
+<form id="form" action="#">
+  <login-field id="first" kind="email" name="email"></login-field>
+  <login-field id="second" kind="password" name="password"></login-field>
+  <button id="send">Sign in</button>
+</form>
+<shut-field id="shut"></shut-field>
+<script>
+  // Each input in a root of its own, as some design systems have it, with the
+  // form around them all and one root nobody outside can see into.
+  customElements.define("login-field", class extends HTMLElement {
+    connectedCallback() {
+      const root = this.attachShadow({ mode: "open" });
+      const input = document.createElement("input");
+      input.type = this.getAttribute("kind");
+      input.name = this.getAttribute("name");
+      input.id = "inner";
+      input.style.width = "300px";
+      root.append(input);
+    }
+  });
+  customElements.define("shut-field", class extends HTMLElement {
+    connectedCallback() {
+      const input = document.createElement("input");
+      input.type = "email";
+      input.style.width = "300px";
+      this.attachShadow({ mode: "closed" }).append(input);
+    }
+  });
+</script>

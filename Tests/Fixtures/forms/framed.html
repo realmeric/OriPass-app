@@ -1,0 +1,11 @@
+<!doctype html>
+<title>The page around a frame</title>
+<p>A page with a form in a frame.</p>
+<script>
+  const frame = document.createElement("iframe");
+  frame.id = "frame";
+  frame.width = 500;
+  frame.height = 200;
+  frame.src = `fixture://${new URLSearchParams(location.search).get("frame")}/plain.html`;
+  document.body.append(frame);
+</script>

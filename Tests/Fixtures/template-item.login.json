@@ -1,0 +1,13 @@
+{
+  "success": true,
+  "data": {
+    "object": "template",
+    "template": {
+      "uris": [],
+      "username": "jdoe",
+      "password": "myp@ssword123",
+      "totp": "JBSWY3DPEHPK3PXP",
+      "fido2Credentials": []
+    }
+  }
+}

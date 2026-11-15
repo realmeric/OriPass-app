@@ -1,0 +1,37 @@
+# xcodegen writes the project; project.yml is the source
+*.xcodeproj
+build/
+DerivedData/
+.DS_Store
+xcuserdata/
+*.xcuserstate
+
+# Every surface rendered from the demo vault. They show canaries, and they are
+# rebuilt by `make shots`. Anchored to the root: git folds case on this disk,
+# and a bare `shots/` hides Sources/Shots and Tests/Shots as well
+/shots/
+
+# 1Password's support stills: for looking at, never shipped
+docs/reference/1password/
+
+# What scripts/spike-bw.sh printed on the real account. Shapes and counts only,
+# but it is read by a person before any of it reaches docs/spikes/bw-2026-10.md
+docs/spikes/bw-run.txt
+
+# What scripts/spike-fd.py printed on the real account: facts, counts and
+# timings, read by a session before any of it reaches docs/spikes
+docs/spikes/fd-run.txt
+
+# What scripts/spike-passkey.py printed on the real account: yes and no and
+# counts, read by a session before any of it reaches docs/spikes
+docs/spikes/passkey-run.txt
+
+# scripts/spike-sync.py's report, run by hand: counts, read by a session
+# before any of it reaches docs/spikes
+docs/spikes/sync-run.txt
+
+# The team a phone build is signed by (Phone/Signing.xcconfig)
+Phone/Team.xcconfig
+
+# The team the Mac app is signed by (Signing.xcconfig)
+/Team.xcconfig

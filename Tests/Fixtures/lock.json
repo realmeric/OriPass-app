@@ -1,0 +1,9 @@
+{
+  "success": true,
+  "data": {
+    "noColor": false,
+    "object": "message",
+    "title": "Your vault is locked.",
+    "message": null
+  }
+}

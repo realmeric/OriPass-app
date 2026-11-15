@@ -1,0 +1,22 @@
+<!doctype html>
+<title>Sign in</title>
+<form id="form">
+  <div id="first">
+    <input id="username" type="text" name="identifier" style="width: 300px">
+    <button id="send">Next</button>
+  </div>
+</form>
+<script>
+  // The password comes second, and the page takes it from script.
+  document.getElementById("form").addEventListener("submit", (event) => {
+    event.preventDefault();
+    if (!document.getElementById("password")) {
+      const name = document.getElementById("username").value;
+      document.getElementById("first").innerHTML = "<p id=name></p>"
+        + "<input id=password type=password name=password style='width: 300px'><button id=send>Sign in</button>";
+      document.getElementById("name").textContent = name;
+      return;
+    }
+    document.getElementById("first").textContent = "Signed in";
+  });
+</script>

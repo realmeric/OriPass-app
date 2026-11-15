@@ -1,0 +1,30 @@
+{
+  "success": true,
+  "data": {
+    "object": "list",
+    "data": [
+      {
+        "passwordHistory": [],
+        "revisionDate": "2026-09-29T10:11:12.345Z",
+        "creationDate": "2025-03-09T09:00:00.000Z",
+        "deletedDate": "2026-09-25T07:00:00.000Z",
+        "object": "item",
+        "id": "3f9d0c7a-0009-4b6e-9d1f-b2f400a1e000",
+        "type": 1,
+        "reprompt": 0,
+        "name": "Kapanan hesap",
+        "favorite": false,
+        "collectionIds": [],
+        "login": {
+          "fido2Credentials": [],
+          "uris": [],
+          "username": null,
+          "password": "CANARY-4",
+          "passwordRevisionDate": null
+        },
+        "attachments": [],
+        "key": "2.Invented0Invented1Invented2==|InventedInventedInventedInventedInventedInventedInventedInventedInventedInventedInventedInvented==|InventedInventedInventedInventedInventedInv=AAAAA"
+      }
+    ]
+  }
+}

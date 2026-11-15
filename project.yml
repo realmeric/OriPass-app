@@ -1,0 +1,245 @@
+name: OriPass
+options:
+  bundleIdPrefix: com.meric
+  deploymentTarget:
+    macOS: "27.0"
+  createIntermediateGroups: true
+
+# The team every build signs with is no file's under version control:
+# Signing.xcconfig reads it from Team.xcconfig, which git ignores, or from
+# OP_TEAM in the environment (README, "Building it yourself").
+configFiles:
+  Debug: Signing.xcconfig
+  Release: Signing.xcconfig
+
+settings:
+  base:
+    # Swift 5 language mode under the 6.4 compiler, as OriNotch has it: the
+    # hot keys, the settings store and the status item are ported from there
+    # file by file, and they are written this way (D3).
+    SWIFT_VERSION: "5.0"
+    SWIFT_STRICT_CONCURRENCY: minimal
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    ARCHS: arm64
+    ONLY_ACTIVE_ARCH: "YES"
+    # The team is the certificate's OU, not the code in parentheses in
+    # `security find-identity`, which xcodebuild rejects.
+    CODE_SIGN_IDENTITY: "Apple Development"
+    CODE_SIGN_STYLE: Manual
+    CODE_SIGNING_REQUIRED: "YES"
+    CODE_SIGNING_ALLOWED: "YES"
+    # The sandbox is off because a sandboxed app may not run
+    # /opt/homebrew/bin/bw. D7's seal is proven to work with no entitlement
+    # at all (OP-3). The app carries two, and neither needs a provisioning
+    # profile: the hardened runtime's leave to send an Apple Event, which
+    # asks a browser for its tab (OP-35), and the group OP-67's door is in.
+    # Debug builds sign with this identity and `scripts/release.sh` with
+    # Developer ID.
+    ENABLE_HARDENED_RUNTIME: "YES"
+    ENABLE_APP_SANDBOX: "NO"
+    ENABLE_USER_SCRIPT_SANDBOXING: "NO"
+
+targets:
+  OriPass:
+    type: application
+    platform: macOS
+    sources:
+      - path: Sources
+      # The Public Suffix List, copied into the bundle as it came.
+      - path: Vendor/psl/public_suffix_list.dat
+        buildPhase: resources
+    dependencies:
+      # Orion's way to the door, signed with the app and before it.
+      - target: oripass-bridge
+        embed: true
+        codeSign: true
+        copy:
+          destination: wrapper
+          subpath: Contents/Helpers
+      # Safari's way to the door. Built for every configuration and put in
+      # the bundle for Release alone (EXCLUDED_SOURCE_FILE_NAMES below).
+      - target: OriPassSafari
+        embed: true
+        codeSign: true
+      # The system's way to the door, the same way.
+      - target: OriPassAutoFill
+        embed: true
+        codeSign: true
+    entitlements:
+      path: OriPass.entitlements
+      properties:
+        com.apple.security.automation.apple-events: true
+        # The group the door for the browser stands in. A group under the
+        # team's own prefix needs no provisioning profile on macOS.
+        com.apple.security.application-groups:
+          - $(DEVELOPMENT_TEAM).oripass
+    info:
+      path: Sources/Info.plist
+      properties:
+        CFBundleName: OriPass
+        CFBundleDisplayName: OriPass
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        LSMinimumSystemVersion: "27.0"
+        NSHumanReadableCopyright: "Copyright © 2026 Meric Kucukmeric"
+        # What macOS shows the first time a browser is asked for its tab.
+        NSAppleEventsUsageDescription: "OriPass asks the browser in front which page it is on, so that Quick Access and the AutoFill sheet can list the login for that site first."
+        # What a row of the item list is while it is dragged to the sidebar:
+        # its id, offered to this process and no other.
+        UTExportedTypeDeclarations:
+          - UTTypeIdentifier: com.meric.oripass.item
+            UTTypeDescription: OriPass item
+            UTTypeConformsTo: [public.data]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.meric.oripass
+        GENERATE_INFOPLIST_FILE: "NO"
+        PRODUCT_NAME: OriPass
+        PRODUCT_MODULE_NAME: OriPass
+        # Sources/Assets.xcassets holds nothing but the icon, which
+        # `make icon` draws.
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+      configs:
+        # A Debug app under DerivedData is one more copy of the extension's
+        # id for the system to choose from, in every worktree there is, and
+        # Safari would not run it anyway: nothing but a notarized build gets
+        # past its developer setting. The provider has a capability no
+        # Debug build has a profile for, so nothing could load that one.
+        Debug:
+          EXCLUDED_SOURCE_FILE_NAMES: OriPassSafari.appex OriPassAutoFill.appex
+
+  oripass-bridge:
+    type: tool
+    platform: macOS
+    sources:
+      - path: Helper
+      - path: Sources/Bridge/BridgeWire.swift
+    entitlements:
+      path: Helper/oripass-bridge.entitlements
+      properties:
+        # What lets it reach the door's file, as the app does.
+        com.apple.security.application-groups:
+          - $(DEVELOPMENT_TEAM).oripass
+    settings:
+      base:
+        PRODUCT_NAME: oripass-bridge
+        # The name the door knows it by (`BridgeCaller.host`). A tool has no
+        # plist to take it from.
+        PRODUCT_BUNDLE_IDENTIFIER: com.meric.oripass.bridge
+        OTHER_CODE_SIGN_FLAGS: "--identifier com.meric.oripass.bridge"
+
+  OriPassSafari:
+    type: app-extension
+    platform: macOS
+    sources:
+      - path: Sources/Bridge/BridgeWire.swift
+      - path: Sources/Bridge/SafariWebExtensionHandler.swift
+      # manifest.json has to lie at the top of Contents/Resources, so the
+      # folder's files go in one by one, and its icons as a folder that stays
+      # one, which is where the manifest looks for them.
+      - path: Extension
+        buildPhase: resources
+        excludes:
+          - icons
+      - path: Extension/icons
+        type: folder
+        buildPhase: resources
+    entitlements:
+      path: Safari/OriPassSafari.entitlements
+      properties:
+        # An app extension is sandboxed or it is not loaded.
+        com.apple.security.app-sandbox: true
+        # All it may reach outside its sandbox is the door.
+        com.apple.security.application-groups:
+          - $(DEVELOPMENT_TEAM).oripass
+    info:
+      path: Safari/Info.plist
+      properties:
+        CFBundleName: OriPassSafari
+        CFBundleDisplayName: OriPass
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        LSMinimumSystemVersion: "27.0"
+        NSHumanReadableCopyright: "Copyright © 2026 Meric Kucukmeric"
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.Safari.web-extension
+          NSExtensionPrincipalClass: "$(PRODUCT_MODULE_NAME).SafariWebExtensionHandler"
+    settings:
+      base:
+        # The name the door knows it by (`BridgeCaller.safari`).
+        PRODUCT_BUNDLE_IDENTIFIER: com.meric.oripass.safari
+        PRODUCT_NAME: OriPassSafari
+        GENERATE_INFOPLIST_FILE: "NO"
+        ENABLE_APP_SANDBOX: "YES"
+
+  OriPassAutoFill:
+    type: app-extension
+    platform: macOS
+    sources:
+      - path: Sources/AutoFill
+      - path: Sources/Bridge/BridgeWire.swift
+      - path: Sources/Vault/Redacted.swift
+      - path: Sources/Design/Buttons.swift
+      - path: Sources/Design/Density.swift
+      - path: Sources/Design/Fonts.swift
+      - path: Sources/Design/Glyphs.swift
+      - path: Sources/Design/Metrics.swift
+      - path: Sources/Design/Palette.swift
+      - path: Sources/Design/Zoom.swift
+    # The entitlements are `AutoFill/OriPassAutoFill.entitlements`, which
+    # `scripts/release.sh` signs with beside a profile. A Debug build is
+    # neither signed nor put in the app, and the same file would have Xcode
+    # ask for a profile.
+    info:
+      path: AutoFill/Info.plist
+      properties:
+        CFBundleName: OriPassAutoFill
+        CFBundleDisplayName: OriPass
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        LSMinimumSystemVersion: "27.0"
+        NSHumanReadableCopyright: "Copyright © 2026 Meric Kucukmeric"
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.authentication-services-credential-provider-ui
+          NSExtensionPrincipalClass: "$(PRODUCT_MODULE_NAME).CredentialProviderViewController"
+          NSExtensionAttributes:
+            ASCredentialProviderExtensionCapabilities:
+              ProvidesOneTimeCodes: true
+              ProvidesPasskeys: true
+              ProvidesPasswords: true
+    settings:
+      base:
+        # The name the door knows it by (`BridgeCaller.autofill`).
+        PRODUCT_BUNDLE_IDENTIFIER: com.meric.oripass.autofill
+        PRODUCT_NAME: OriPassAutoFill
+        GENERATE_INFOPLIST_FILE: "NO"
+        ENABLE_APP_SANDBOX: "YES"
+      configs:
+        Debug:
+          CODE_SIGNING_ALLOWED: "NO"
+
+  OriPassTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: Tests
+    dependencies:
+      - target: OriPass
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.meric.oripass.tests
+        GENERATE_INFOPLIST_FILE: "YES"
+
+schemes:
+  OriPass:
+    build:
+      targets:
+        OriPass: all
+        OriPassTests: [test]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - OriPassTests

@@ -1,0 +1,11 @@
+/* The one sheet that reaches the page itself, in its top frame: `style.css` only
+   reaches this extension's closed roots. It takes away the browser's own button
+   in a field, where the mark stands in its place, and gives back its room.
+   `display` is not used: below user level WebKit draws the button in spite of
+   it, and a browser may not put this sheet at user level. */
+input::-webkit-credentials-auto-fill-button,
+input::-webkit-strong-password-auto-fill-button {
+  visibility: hidden !important;
+  width: 0 !important;
+  margin: 0 !important;
+}

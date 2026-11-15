@@ -1,0 +1,82 @@
+<!doctype html>
+<title>Sign in</title>
+<script>
+  window.heardMessages = 0;
+  addEventListener("message", () => { window.heardMessages += 1; });
+</script>
+<form action="#">
+  <input id="username" type="text" name="username" size="40">
+  <input id="password" type="password" name="password" size="40">
+  <button id="send" type="button">Sign in</button>
+</form>
+<script>
+  // What a relying party's page does: it asks, and it reads what it was given.
+  window.challenge = crypto.getRandomValues(new Uint8Array(32));
+
+  window.ask = async (extra = {}, publicKey = {}) => {
+    window.outcome = null;
+    window.options = { publicKey: { challenge: window.challenge, ...publicKey }, ...extra };
+    try {
+      window.got = await navigator.credentials.get(window.options);
+      window.outcome = { kind: typeof window.got === "string" ? window.got : "credential" };
+    } catch (error) {
+      window.outcome = { kind: "error", name: error.name };
+    }
+  };
+
+  const bytes = (buffer) => new Uint8Array(buffer);
+  const same = (one, other) => one.length === other.length && one.every((byte, place) => byte === other[place]);
+  const safely = (buffer) => btoa(String.fromCharCode(...bytes(buffer)))
+    .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+
+  // An ECDSA signature as a certificate writes it, as the two numbers WebCrypto
+  // wants.
+  function plain(der) {
+    const part = (at) => {
+      let length = der[at + 1];
+      let start = at + 2;
+      while (length > 32) { start += 1; length -= 1; }
+      const sized = new Uint8Array(32);
+      sized.set(der.subarray(start, start + length), 32 - length);
+      return { sized, end: at + 2 + der[at + 1] };
+    };
+    const first = part(2);
+    const second = part(first.end);
+    const joined = new Uint8Array(64);
+    joined.set(first.sized);
+    joined.set(second.sized, 32);
+    return joined;
+  }
+
+  // What a server does with an assertion, given the origin and the relying
+  // party it expects and the public key it keeps. It says what it refused.
+  window.verify = async (origin, relyingParty, publicKey, credentialId) => {
+    const got = window.got;
+    if (!(got instanceof PublicKeyCredential)) return "not a PublicKeyCredential";
+    if (!(got.response instanceof AuthenticatorAssertionResponse)) return "not an assertion's response";
+    if (got.type !== "public-key") return "type";
+    if (got.id !== safely(got.rawId) || got.id !== credentialId) return "id";
+    if (Object.keys(got.getClientExtensionResults()).length) return "extensions";
+    const client = JSON.parse(new TextDecoder().decode(got.response.clientDataJSON));
+    if (client.type !== "webauthn.get") return "client data's type";
+    if (client.challenge !== safely(window.challenge)) return "client data's challenge";
+    if (client.origin !== origin) return "client data's origin";
+    if (client.crossOrigin !== false) return "client data's cross origin";
+    const data = bytes(got.response.authenticatorData);
+    const expected = bytes(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(relyingParty)));
+    if (!same(data.subarray(0, 32), expected)) return "relying party's hash";
+    if ((data[32] & 0x05) !== 0x05) return "flags";
+    if (!got.response.userHandle) return "user handle";
+    const hash = bytes(await crypto.subtle.digest("SHA-256", got.response.clientDataJSON));
+    const signed = new Uint8Array(data.length + hash.length);
+    signed.set(data);
+    signed.set(hash, data.length);
+    const key = await crypto.subtle.importKey("jwk", publicKey, { name: "ECDSA", namedCurve: "P-256" }, false, ["verify"]);
+    const good = await crypto.subtle.verify({ name: "ECDSA", hash: "SHA-256" }, key,
+      plain(bytes(got.response.signature)), signed);
+    if (!good) return "signature";
+    const written = JSON.parse(JSON.stringify(got));
+    if (written.id !== got.id || written.response.signature !== safely(got.response.signature)) return "toJSON";
+    return "taken";
+  };
+</script>

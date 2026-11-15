@@ -1,0 +1,15 @@
+<!doctype html>
+<title>A form that arrives by itself</title>
+<div id="place"></div>
+<script>
+  window.addEventListener("load", () => setTimeout(() => {
+    const form = document.createElement("form");
+    form.id = "form";
+    const field = document.createElement("input");
+    field.id = "username";
+    field.type = "email";
+    field.style.width = "300px";
+    form.append(field);
+    document.getElementById("place").append(form);
+  }, 1000));
+</script>

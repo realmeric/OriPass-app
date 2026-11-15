@@ -1,0 +1,14 @@
+{
+  "name": "oripass",
+  "description": "OriPass's plugin for Claude Code.",
+  "owner": {
+    "name": "realmeric"
+  },
+  "plugins": [
+    {
+      "name": "oripass",
+      "source": "./",
+      "description": "Lets a Claude Code session use OriPass's SSH agent: plain ssh, a finger on the Mac, and no key on disk or in the session."
+    }
+  ]
+}

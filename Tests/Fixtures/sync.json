@@ -1,0 +1,9 @@
+{
+  "success": true,
+  "data": {
+    "noColor": false,
+    "object": "message",
+    "title": "Syncing complete.",
+    "message": null
+  }
+}

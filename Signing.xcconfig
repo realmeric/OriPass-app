@@ -1,0 +1,5 @@
+// Every build is signed by the team in Team.xcconfig, which git ignores,
+// or by OP_TEAM in the environment. Team.xcconfig holds one line:
+// OP_TEAM = <the ten characters of the team id>
+#include? "Team.xcconfig"
+DEVELOPMENT_TEAM = $(OP_TEAM)

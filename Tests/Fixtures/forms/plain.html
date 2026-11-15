@@ -1,0 +1,14 @@
+<!doctype html>
+<title>Sign in</title>
+<form id="form" action="#">
+  <input id="username" type="email" name="email" style="width: 300px">
+  <input id="password" type="password" name="password" style="width: 300px">
+  <button>Sign in</button>
+</form>
+<script>
+  window.submitted = 0;
+  document.getElementById("form").addEventListener("submit", (event) => {
+    event.preventDefault();
+    window.submitted += 1;
+  });
+</script>

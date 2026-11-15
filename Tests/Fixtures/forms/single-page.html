@@ -1,0 +1,18 @@
+<!doctype html>
+<title>Sign in</title>
+<div id="root">
+  <input id="username" type="email" style="width: 300px">
+  <input id="password" type="password" style="width: 300px">
+  <button id="send">Sign in</button>
+</div>
+<script>
+  // No form, as a page that signs in from script has it. A word in the
+  // password field keeps it there, as a refusal does.
+  document.getElementById("send").addEventListener("click", () => {
+    if (document.getElementById("password").value === "wrong") return;
+    setTimeout(() => {
+      history.pushState({}, "", "/dashboard");
+      document.getElementById("root").textContent = "Signed in";
+    }, 60);
+  });
+</script>

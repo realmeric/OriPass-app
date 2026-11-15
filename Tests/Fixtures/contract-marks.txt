@@ -1,0 +1,15 @@
+# What scripts/contract.sh cannot tell from a fixture by looking at it.
+# One mark a line: the fixture (a name, or a prefix ending in *), the mark,
+# and a path as the script prints them, with [type=*] for every type.
+#
+#   own    a key no bw ever sent. The fixture carries it so that a test can
+#          show an unmodelled key going back in a write. Never a difference.
+#   whole  the fixture claims every key under this path, so one bw adds
+#          there is a difference and not only news.
+
+list-items  own    data.data[type=1].somethingNew
+
+# The app sends a template's keys back in a new item without knowing what
+# they are (Item.blank), so a key added to one is a key the app starts to
+# write.
+template-*  whole  data.template

@@ -1,0 +1,20 @@
+<!doctype html>
+<title>A long page</title>
+<div id="page"></div>
+<form id="form" action="#">
+  <input id="username" type="email" name="email" style="width: 300px">
+  <input id="password" type="password" name="password" style="width: 300px">
+</form>
+<script>
+  const page = document.getElementById("page");
+  for (let section = 0; section < 1000; section += 1) {
+    const box = document.createElement("section");
+    for (let line = 0; line < 9; line += 1) {
+      const part = document.createElement(line % 3 ? "p" : "div");
+      part.textContent = `line ${line}`;
+      box.append(part);
+    }
+    page.append(box);
+  }
+  window.nodes = document.querySelectorAll("*").length;
+</script>

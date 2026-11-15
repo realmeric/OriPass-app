@@ -1,0 +1,196 @@
+name: OriPassPhone
+options:
+  bundleIdPrefix: com.meric
+  deploymentTarget:
+    iOS: "26.0"
+  createIntermediateGroups: true
+
+configFiles:
+  Debug: Signing.xcconfig
+  Release: Signing.xcconfig
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    TARGETED_DEVICE_FAMILY: "1"
+    # Argon2id at Bitwarden's defaults takes four seconds unoptimised, which
+    # a test and a sign-in on the simulator would wait through.
+    SWIFT_OPTIMIZATION_LEVEL: "-O"
+    ENABLE_USER_SCRIPT_SANDBOXING: "NO"
+    # A simulator build is signed to run locally and needs no team. A phone
+    # build takes DEVELOPMENT_TEAM from Team.xcconfig, which git ignores.
+    CODE_SIGN_STYLE: Automatic
+    "CODE_SIGN_IDENTITY[sdk=iphonesimulator*]": "-"
+
+# The Mac's own files that mean the same on a phone, compiled from where they
+# are so that a fix in one is a fix in both.
+targetTemplates:
+  Shared:
+    sources:
+      - path: Sources/Kit
+      # The forms both the app and the AutoFill extension draw.
+      - path: Sources/Forms
+      - path: ../Sources/Vault/Redacted.swift
+      - path: ../Sources/Vault/SecretBytes.swift
+      - path: ../Sources/Totp/Totp.swift
+      - path: ../Sources/Front/PublicSuffix.swift
+      - path: ../Sources/Icons/SiteHost.swift
+      - path: ../Sources/Editor/PastedKey.swift
+      - path: ../Sources/Strength/Strength.swift
+      - path: ../Sources/Strength/Guesswork.swift
+      - path: ../Sources/Strength/Words.swift
+      - path: ../Vendor/eff/eff_large_wordlist.txt
+        buildPhase: resources
+      - path: ../Vendor/psl/public_suffix_list.dat
+        buildPhase: resources
+
+targets:
+  OriPass:
+    type: application
+    platform: iOS
+    templates: [Shared]
+    sources:
+      - path: Sources/App
+    dependencies:
+      - target: OriPassAutoFill
+    entitlements:
+      path: Sources/App/OriPass.entitlements
+      properties:
+        com.apple.developer.authentication-services.autofill-credential-provider: true
+        com.apple.security.application-groups: [group.com.meric.oripass]
+        keychain-access-groups: ["$(AppIdentifierPrefix)com.meric.oripass.shared"]
+    info:
+      path: Sources/App/Info.plist
+      properties:
+        CFBundleDisplayName: OriPass
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        UILaunchScreen: {}
+        UIApplicationSupportsIndirectInputEvents: true
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+        UIRequiresFullScreen: true
+        UIBackgroundModes: [fetch]
+        UIApplicationShortcutItems:
+          - UIApplicationShortcutItemType: com.meric.oripass.ios.generate
+            UIApplicationShortcutItemTitle: Generate Password
+            UIApplicationShortcutItemIconSymbolName: wand.and.stars
+          - UIApplicationShortcutItemType: com.meric.oripass.ios.search
+            UIApplicationShortcutItemTitle: Search
+            UIApplicationShortcutItemIconSymbolName: magnifyingglass
+        BGTaskSchedulerPermittedIdentifiers: [com.meric.oripass.ios.sync]
+        ITSAppUsesNonExemptEncryption: false
+        NSFaceIDUsageDescription: "Face ID opens your vault."
+        OPKeychainGroup: "$(AppIdentifierPrefix)com.meric.oripass.shared"
+        # http to this phone alone, which is the stand-in on the simulator.
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.meric.oripass.ios
+        PRODUCT_NAME: OriPass
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        PRODUCT_MODULE_NAME: OriPass
+
+  OriPassAutoFill:
+    type: app-extension
+    platform: iOS
+    templates: [Shared]
+    sources:
+      - path: Sources/AutoFill
+    entitlements:
+      path: Sources/AutoFill/OriPassAutoFill.entitlements
+      properties:
+        com.apple.developer.authentication-services.autofill-credential-provider: true
+        com.apple.security.application-groups: [group.com.meric.oripass]
+        keychain-access-groups: ["$(AppIdentifierPrefix)com.meric.oripass.shared"]
+    info:
+      path: Sources/AutoFill/Info.plist
+      properties:
+        CFBundleDisplayName: OriPass
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        NSFaceIDUsageDescription: "Face ID opens your vault."
+        OPKeychainGroup: "$(AppIdentifierPrefix)com.meric.oripass.shared"
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.authentication-services-credential-provider-ui
+          NSExtensionPrincipalClass: "$(PRODUCT_MODULE_NAME).CredentialProviderViewController"
+          NSExtensionAttributes:
+            ASCredentialProviderExtensionCapabilities:
+              ProvidesPasswords: true
+              ProvidesOneTimeCodes: true
+              ProvidesPasskeys: true
+              ShowsConfigurationUI: true
+              SupportsSavePasswordCredentials: true
+              SupportsGeneratePasswordCredentials: true
+              SupportsGeneratePasswordCredentialsWithUI: false
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.meric.oripass.ios.autofill
+        PRODUCT_NAME: OriPassAutoFill
+        SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) AUTOFILL_EXTENSION"
+        PRODUCT_MODULE_NAME: OriPassAutoFill
+
+  OriPassTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: Tests
+    dependencies:
+      - target: OriPass
+    settings:
+      base:
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/OriPass.app/OriPass"
+        BUNDLE_LOADER: "$(TEST_HOST)"
+        PRODUCT_BUNDLE_IDENTIFIER: com.meric.oripass.ios.tests
+        GENERATE_INFOPLIST_FILE: "YES"
+
+  # Two fields and nothing else, for a fill in an app that is not Safari.
+  # Built for the UI tests and never shipped.
+  OriPassForms:
+    type: application
+    platform: iOS
+    sources:
+      - path: Forms
+    info:
+      path: Forms/Info.plist
+      properties:
+        CFBundleDisplayName: Forms
+        UILaunchScreen: {}
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.meric.oripass.forms
+        PRODUCT_NAME: OriPassForms
+
+  # Drives the app, Safari and the AutoFill sheet on the simulator against
+  # scripts/standin.py, which `make phone-ui` starts.
+  OriPassUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: UITests
+    dependencies:
+      - target: OriPass
+      - target: OriPassForms
+    settings:
+      base:
+        TEST_TARGET_NAME: OriPass
+        PRODUCT_BUNDLE_IDENTIFIER: com.meric.oripass.ios.uitests
+        GENERATE_INFOPLIST_FILE: "YES"
+
+schemes:
+  OriPassUI:
+    build:
+      targets:
+        OriPass: all
+        OriPassUITests: [test]
+    test:
+      targets: [OriPassUITests]
+  OriPass:
+    build:
+      targets:
+        OriPass: all
+        OriPassTests: [test]
+    test:
+      targets: [OriPassTests]

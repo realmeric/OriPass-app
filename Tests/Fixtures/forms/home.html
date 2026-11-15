@@ -1,0 +1,23 @@
+<!doctype html>
+<title>Home</title>
+<style>
+  body { margin: 0; font: 15px/22px -apple-system, sans-serif; color: #24262b; background: #f7f7f5; }
+  header { display: flex; gap: 22px; padding: 16px 28px; background: #fff; border-bottom: 1px solid #e4e4e0; font-weight: 600; }
+  main { max-width: 620px; margin: 34px 28px; }
+  h1 { font-size: 26px; line-height: 32px; margin: 0 0 12px; }
+  p { color: #5c5f66; }
+  .tile { height: 96px; margin-top: 18px; border-radius: 12px; background: #fff; border: 1px solid #e4e4e0; }
+  @media (prefers-color-scheme: dark) {
+    body { color: #e7e7e4; background: #16171a; }
+    header, .tile { background: #1f2024; border-color: #303136; }
+    p { color: #a2a4aa; }
+  }
+</style>
+<header><span>Northwind</span><span>Orders</span><span>Team</span><span>Billing</span></header>
+<main>
+  <h1>Welcome back</h1>
+  <p>Three orders are waiting for you, and your team left two notes since you were last here.</p>
+  <div class="tile"></div>
+  <div class="tile"></div>
+  <div class="tile"></div>
+</main>

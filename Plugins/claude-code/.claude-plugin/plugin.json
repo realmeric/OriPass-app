@@ -1,0 +1,8 @@
+{
+  "name": "oripass",
+  "version": "0.1.0",
+  "description": "Lets a Claude Code session use OriPass's SSH agent: plain ssh, a finger on the Mac, and no key on disk or in the session.",
+  "author": {
+    "name": "realmeric"
+  }
+}

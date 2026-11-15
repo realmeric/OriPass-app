@@ -1,0 +1,36 @@
+<!doctype html>
+<title>Sign in</title>
+<div id="root"></div>
+<script>
+  // What a React field does: `value` is watched on the element itself, a change
+  // reaches the page's state only through `input`, and only when the value is
+  // not the one last watched going by, and each render writes the state back.
+  window.state = { username: "", password: "" };
+  const native = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value");
+
+  function field(id, type) {
+    const input = document.createElement("input");
+    input.id = id;
+    input.type = type;
+    input.name = id;
+    input.style.width = "300px";
+    let tracked = "";
+    Object.defineProperty(input, "value", {
+      configurable: true,
+      get() { return native.get.call(this); },
+      set(value) { tracked = String(value); native.set.call(this, value); },
+    });
+    input.addEventListener("input", () => {
+      const now = native.get.call(input);
+      if (now === tracked) return;
+      tracked = now;
+      window.state[id] = now;
+      input.value = window.state[id];
+    });
+    return input;
+  }
+
+  const form = document.createElement("form");
+  form.append(field("username", "text"), field("password", "password"));
+  document.getElementById("root").append(form);
+</script>

@@ -1,0 +1,13 @@
+{
+  "success": true,
+  "data": {
+    "object": "template",
+    "template": {
+      "serverUrl": null,
+      "lastSync": "2026-10-01T08:15:30.123Z",
+      "userEmail": "deniz@example.com",
+      "userId": "7b1c2f0e-5a44-4c1d-9a65-b2f400a1c001",
+      "status": "locked"
+    }
+  }
+}

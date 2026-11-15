@@ -1,0 +1,15 @@
+{
+  "success": true,
+  "data": {
+    "object": "template",
+    "template": {
+      "passwordHistory": [],
+      "type": 1,
+      "name": "Item name",
+      "notes": "Some notes about this item.",
+      "favorite": false,
+      "fields": [],
+      "reprompt": 0
+    }
+  }
+}

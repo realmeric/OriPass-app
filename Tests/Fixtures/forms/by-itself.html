@@ -1,0 +1,19 @@
+<!doctype html>
+<title>Sign in</title>
+<form id="form">
+  <input id="username" type="email" name="email" style="width: 300px">
+  <input id="password" type="password" name="password" style="width: 300px">
+</form>
+<script>
+  // Nobody has touched this page. It fills its own form and sends it.
+  document.getElementById("form").addEventListener("submit", (event) => {
+    event.preventDefault();
+    event.target.remove();
+    document.title = "Sent";
+  });
+  addEventListener("load", () => {
+    document.getElementById("username").value = "kanarya-forged@example.test";
+    document.getElementById("password").value = "kanarya-forged";
+    document.getElementById("form").requestSubmit();
+  });
+</script>

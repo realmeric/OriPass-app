@@ -1,0 +1,10 @@
+{
+  "success": true,
+  "data": {
+    "noColor": false,
+    "object": "message",
+    "title": "Your vault is now unlocked!",
+    "message": "\nTo unlock your vault, set your session key to the `BW_SESSION` environment variable. ex:\n$ export BW_SESSION=\"CANARY-SESSION-q3J8mZ1x0vT5bN7cR2dF4gH6jK8lP0sA1uW3yE5iO7pQ9rT1vX3zB5nM7c==\"",
+    "raw": "CANARY-SESSION-q3J8mZ1x0vT5bN7cR2dF4gH6jK8lP0sA1uW3yE5iO7pQ9rT1vX3zB5nM7c=="
+  }
+}

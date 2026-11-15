@@ -1,0 +1,15 @@
+{
+  "success": true,
+  "data": {
+    "object": "list",
+    "data": [
+      {
+        "object": "collection",
+        "id": "0c7d4e2a-3333-4a3b-8c2d-b2f400a1d003",
+        "organizationId": "0e9b6a1c-4444-4a3b-8c2d-b2f400a1d004",
+        "name": "Ortak",
+        "externalId": null
+      }
+    ]
+  }
+}
